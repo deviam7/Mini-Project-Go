@@ -1,25 +1,43 @@
-name: Deploy to Digital Ocean
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.head_commit.modified_files  contains('path/to/file') }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup SSH key
-        uses: webfactory/ssh-agent@v0.4.1
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y golang-go
-      - name: Deploy application
-        run: |
-          ssh -o "StrictHostKeyChecking=no" $SSH_USER@$188.166.184.75 "cd /path/to/application && git pull && go build && sudo systemctl restart deviapp.service"
+---
+  - name: Deploy to DigitalOcean
+    hosts: 178.128.85.125
+    remote_user: root
+    vars:
+      db_username: doadmin
+      db_password: AVNS_H2AHwsJhR9To34OEkeD
+      db_host: dbaas-db-4459780-do-user-12872560-0.b.db.ondigitalocean.com
+      db_port: 25060
+      db_name: defaultdb
+      db_sslmode: REQUIRED
+    tasks:
+      - name: Install MySQL client
+        apt:
+          name: mysql-client
+          state: present
+        become: true
+  
+      - name: Create database user
+        mysql_user:
+          name: "{{ defaultdb }}"
+          password: "{{  }}"
+          login_host: "{{ dbaas-db-4459780-do-user-12872560-0.b.db.ondigitalocean.com }}"
+          login_port: "{{ 25060 }}"
+          login_user: "{{ doadmin }}"
+          login_password: "{{ AVNS_H2AHwsJhR9To34OEkeD }}"
+          state: present
+        become: true
+  
+      - name: Create database
+        mysql_db:
+          name: "{{ defaultdb }}"
+          collation: utf8_general_ci
+          encoding: utf8
+          login_host: "{{ dbaas-db-4459780-do-user-12872560-0.b.db.ondigitalocean.com}}"
+          login_port: "{{ 25060 }}"
+          login_user: "{{ doadmin }}"
+          login_password: "{{ AVNS_H2AHwsJhR9To34OEkeD }}"
+          state: present
+        become: true
+  
+      # Add your deployment tasks here
+  
