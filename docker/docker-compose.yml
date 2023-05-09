@@ -1,0 +1,20 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "dede@1234DB"
+      MYSQL_DATABASE: mini_project
+    ports:
+      - "25060:25060"
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db:25060
+      DB_USER: doadmin
+      DB_PASSWORD: "AVNS_H2AHwsJhR9To34OEkeD"
+      DB_NAME: mini_project
