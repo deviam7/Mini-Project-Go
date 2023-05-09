@@ -32,7 +32,7 @@ jobs:
       run: |
         docker build -t deviapp .
         docker tag deviapp:latest deviam7/deviapp:latest
-        docker push deviapp:latest deviam7/deviapp:latest
+        docker push deviam7/deviapp:latest
 
   deploy:
     needs: build
@@ -48,7 +48,7 @@ jobs:
         DROPLET_ID: deviapp
       run: |
         doctl auth init --access-token ${{ secrets.CS_DIGITAL_OCEAN_ACCESS_TOKEN }}
-        doctl compute ssh $DROPLET_ID --ssh-command 'docker pull deviapp:latest deviam7/deviapp:latest'
+        doctl compute ssh $DROPLET_ID --ssh-command 'docker pull deviam7/deviapp:latest'
         doctl compute ssh $DROPLET_ID --ssh-command 'docker stop deviapp-container || true'
         doctl compute ssh $DROPLET_ID --ssh-command 'docker rm deviapp-container || true'
-        doctl compute ssh $DROPLET_ID --ssh-command 'docker run -d --name deviapp-container -p 8080:8080 --restart always deviapp:latest deviam7/deviapp:latest'
+        doctl compute ssh $DROPLET_ID --ssh-command 'docker run -d --name deviapp-container -p 8080:8080 --restart always deviam7/deviapp:latest'
